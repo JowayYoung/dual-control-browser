@@ -73,7 +73,7 @@ function InitApp() {
     backBtn = document.getElementById("back-btn");
     forwardBtn = document.getElementById("forward-btn");
     refreshBtn = document.getElementById("refresh-btn");
-    themeBtn = document.getElementById("theme-toggle");
+    themeBtn = document.getElementById("theme-btn");
     webviewA = document.getElementById("webview-a");
     webviewB = document.getElementById("webview-b");
     ApplyTheme(currTheme);

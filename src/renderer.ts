@@ -92,7 +92,7 @@ function InitApp() {
 	backBtn = document.getElementById("back-btn") as HTMLButtonElement;
 	forwardBtn = document.getElementById("forward-btn") as HTMLButtonElement;
 	refreshBtn = document.getElementById("refresh-btn") as HTMLButtonElement;
-	themeBtn = document.getElementById("theme-toggle") as HTMLButtonElement;
+	themeBtn = document.getElementById("theme-btn") as HTMLButtonElement;
 	webviewA = document.getElementById("webview-a") as Electron.WebviewTag;
 	webviewB = document.getElementById("webview-b") as Electron.WebviewTag;
 	ApplyTheme(currTheme);

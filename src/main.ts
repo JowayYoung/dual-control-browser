@@ -12,6 +12,7 @@ let mainWindow: BrowserWindow | null = null;
 
 // 创建主窗口
 function CreateWindow() {
+	console.log("preload.js", join(__dirname, "./preload.js"));
 	// 创建浏览器窗口
 	mainWindow = new BrowserWindow({
 		height: 1000,
@@ -20,13 +21,13 @@ function CreateWindow() {
 		webPreferences: {
 			contextIsolation: true, // 隔离主进程与渲染进程的上下文
 			nodeIntegration: false, // 禁止渲染进程访问主线程的Node环境
-			preload: join(__dirname, "preload.js"),
+			preload: join(__dirname, "./preload.js"),
 			webviewTag: true // 启用Webview标签
 		},
 		width: 1600
 	});
 	// 加载应用入口文件
-	mainWindow.loadFile(join(__dirname, "../src/index.html"));
+	mainWindow.loadFile(join(__dirname, "./index.html"));
 	// 打开开发者工具
 	mainWindow.webContents.openDevTools();
 	// 关闭窗口时清除引用
