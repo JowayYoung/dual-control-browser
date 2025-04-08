@@ -1,0 +1,58 @@
+<!doctype html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1, minimum-scale=1, maximum-scale=1">
+	<title>双重控制浏览器</title>
+	<link rel="stylesheet" href="https://jowayyoung.github.io/static/css/reset.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="./style.js"></script>
+</head>
+
+<body class="bg-background-light text-text-light dark:bg-background-dark dark:text-text-dark h-screen flex flex-col">
+	<!-- 顶部工具栏 -->
+	<header class="flex items-center p-2 border-b border-border-light dark:border-border-dark bg-white dark:bg-gray-800 shadow-sm">
+		<!-- 导航按钮组 -->
+		<div class="flex space-x-2 mr-2">
+			<button id="back-button" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="后退">
+				<span class="material-icons text-gray-600 dark:text-gray-300">arrow_back</span>
+			</button>
+			<button id="forward-button" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="前进">
+				<span class="material-icons text-gray-600 dark:text-gray-300">arrow_forward</span>
+			</button>
+			<button id="refresh-button" class="p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="刷新">
+				<span class="material-icons text-gray-600 dark:text-gray-300">refresh</span>
+			</button>
+		</div>
+		<!-- 地址栏 -->
+		<div class="flex-1 flex items-center">
+			<div class="relative flex-1">
+				<input id="url-input" type="text" placeholder="输入网址" class="w-full py-1.5 px-3 pr-10 rounded-lg border border-border-light dark:border-border-dark bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark">
+				<button id="go-button" class="absolute right-1 top-1/2 transform -translate-y-1/2 p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-600">
+					<span class="material-icons text-primary-light dark:text-primary-dark">arrow_forward</span>
+				</button>
+			</div>
+		</div>
+		<!-- 主题切换按钮 -->
+		<button id="theme-btn" class="ml-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700" title="切换主题">
+			<span class="material-icons text-gray-600 dark:text-gray-300 dark:hidden">dark_mode</span>
+			<span class="material-icons text-gray-300 hidden dark:block">light_mode</span>
+		</button>
+	</header>
+	<!-- 浏览器窗口容器 -->
+	<main class="flex-1 flex overflow-hidden">
+		<!-- A窗口 -->
+		<div class="w-1/2 h-full border-r border-border-light dark:border-border-dark">
+			<webview id="webview-a" src="about:blank" class="w-full h-full"></webview>
+		</div>
+		<!-- B窗口 -->
+		<div class="w-1/2 h-full">
+			<webview id="webview-b" src="about:blank" class="w-full h-full"></webview>
+		</div>
+	</main>
+	<script src="./renderer.js"></script>
+</body>
+
+</html>
