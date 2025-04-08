@@ -8,10 +8,61 @@
 	<link rel="stylesheet" href="https://jowayyoung.github.io/static/css/reset.css">
 	<link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
 	<script src="https://cdn.tailwindcss.com"></script>
+	<script src="../dist/style.js"></script>
+	<style type="text/tailwindcss">
+		@layer components {
+			.btn {
+				@apply flex items-center justify-center p-2 rounded-md transition-colors;
+			}
+			.btn-icon {
+				@apply btn bg-surface-light hover:bg-gray-100 dark:bg-surface-dark dark:hover:bg-gray-700;
+			}
+			.input-url {
+				@apply w-full px-4 py-2 bg-surface-light dark:bg-surface-dark border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark;
+			}
+		}
+	</style>
 </head>
 
-<body>
-	<h1>Hello JowayYoung</h1>
+<body class="bg-background-light dark:bg-background-dark text-text-light dark:text-text-dark h-screen flex flex-col">
+	<!-- 顶部工具栏 -->
+	<header class="bg-surface-light dark:bg-surface-dark p-2 shadow-md flex items-center space-x-2 border-b border-gray-300 dark:border-gray-700">
+		<!-- URL输入框 -->
+		<div class="flex-1 flex items-center">
+			<input type="text" id="url-input" class="input-url" placeholder="输入网址..." />
+			<button id="go-button" class="btn-icon ml-2" title="前往">
+				<span class="material-icons">navigation</span>
+			</button>
+		</div>
+		<!-- 导航控制按钮 -->
+		<div class="flex items-center space-x-1">
+			<button id="back-button" class="btn-icon" title="后退">
+				<span class="material-icons">arrow_back</span>
+			</button>
+			<button id="forward-button" class="btn-icon" title="前进">
+				<span class="material-icons">arrow_forward</span>
+			</button>
+			<button id="refresh-button" class="btn-icon" title="刷新">
+				<span class="material-icons">refresh</span>
+			</button>
+			<button id="theme-toggle" class="btn-icon" title="切换主题">
+				<span id="theme-icon" class="material-icons">dark_mode</span>
+			</button>
+		</div>
+	</header>
+	<!-- 浏览器窗口容器 -->
+	<main class="flex-1 flex overflow-hidden">
+		<!-- A窗口 -->
+		<div class="w-1/2 h-full border-r border-gray-300 dark:border-gray-700">
+			<webview id="webview-a" class="w-full h-full" src="about:blank"></webview>
+		</div>
+		<!-- B窗口 -->
+		<div class="w-1/2 h-full">
+			<webview id="webview-b" class="w-full h-full" src="about:blank"></webview>
+		</div>
+	</main>
+	<!-- 加载渲染进程脚本 -->
+	<script src="../dist/renderer.js"></script>
 </body>
 
 </html>
