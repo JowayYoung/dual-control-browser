@@ -1,0 +1,9 @@
+{
+	"exclude": [
+		"src/preload.ts"
+	],
+	"extends": "./tsconfig.json",
+	"include": [
+		"src"
+	]
+}

@@ -7,7 +7,9 @@ let themeBtn: HTMLButtonElement;
 let webviewA: Electron.WebviewTag;
 let webviewB: Electron.WebviewTag;
 
-let currTheme: "light" | "dark" = "light";
+let currTheme: "dark" | "light" = "light";
+
+const DEFAULT_URL = "https://www.loreal-boutique.com/";
 
 // 应用主题
 function ApplyTheme(theme: "dark" | "light" = "light") {
@@ -86,10 +88,12 @@ function InitApp() {
 	themeBtn = document.getElementById("theme-btn") as HTMLButtonElement;
 	webviewA = document.getElementById("webview-a") as Electron.WebviewTag;
 	webviewB = document.getElementById("webview-b") as Electron.WebviewTag;
-	console.log("Chrome Version: ", window.eapi.chromeVer());
 	ApplyTheme(currTheme);
 	SetupEventListeners();
-	GotoUrl("https://baidu.com");
+	setTimeout(() => GotoUrl(DEFAULT_URL), 500);
+	console.log("Electron Version: ", window.eapi.electronVer());
+	console.log("Chrome Version: ", window.eapi.chromeVer());
+	console.log("Node Version: ", window.eapi.nodeVer());
 }
 
 // 当DOM加载完成初始化应用

@@ -8,6 +8,7 @@ let themeBtn;
 let webviewA;
 let webviewB;
 let currTheme = "light";
+const DEFAULT_URL = "https://www.loreal-boutique.com/";
 function ApplyTheme(theme = "light") {
     const root = document.documentElement;
     const themeIcon = document.getElementById("theme-icon");
@@ -72,9 +73,11 @@ function InitApp() {
     themeBtn = document.getElementById("theme-btn");
     webviewA = document.getElementById("webview-a");
     webviewB = document.getElementById("webview-b");
-    console.log("Chrome Version: ", window.eapi.chromeVer());
     ApplyTheme(currTheme);
     SetupEventListeners();
-    GotoUrl("https://baidu.com");
+    setTimeout(() => GotoUrl(DEFAULT_URL), 500);
+    console.log("Electron Version: ", window.eapi.electronVer());
+    console.log("Chrome Version: ", window.eapi.chromeVer());
+    console.log("Node Version: ", window.eapi.nodeVer());
 }
 document.addEventListener("DOMContentLoaded", InitApp);

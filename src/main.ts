@@ -12,9 +12,9 @@ let mainWindow: BrowserWindow | null = null;
 
 // 创建主窗口
 function CreateWindow() {
-	console.log("preload.js", join(__dirname, "./preload.js"));
 	// 创建浏览器窗口
 	mainWindow = new BrowserWindow({
+		fullscreen: true, // 启动时全屏显示
 		height: 1000,
 		minHeight: 1000,
 		minWidth: 1600,
