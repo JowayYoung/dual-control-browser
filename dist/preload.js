@@ -4,8 +4,6 @@ contextBridge.exposeInMainWorld("electronAPI", {
     onLoadUrl: (callback) => {
         const subscription = (_event, url) => callback(url);
         ipcRenderer.on("load-url", subscription);
-        return () => {
-            ipcRenderer.removeListener("load-url", subscription);
-        };
+        return () => ipcRenderer.removeListener("load-url", subscription);
     }
 });

@@ -47,7 +47,7 @@ app.whenReady().then(() => {
 
 // 当所有窗口关闭时退出应用
 app.on("window-all-closed", () => {
-	// 在MacOS中除非用户使用Cmd+Q确定地退出，否则绝大部分应用及其菜单栏会保持激活
+	// 在MacOS中除非用户使用Cmd+Q明确退出，否则应用及其菜单栏通常会保持活动状态
 	if (platform !== "darwin") {
 		app.quit();
 	}

@@ -9,7 +9,7 @@
 		"build": "tsc",
 		"dev": "tsc -w",
 		"remove": "rimraf node_modules package-lock.json pnpm-lock.yaml yarn.lock",
-		"start": "electron ."
+		"start": "npm run build && electron ."
 	},
 	"engines": {
 		"node": ">=16.0.0",
