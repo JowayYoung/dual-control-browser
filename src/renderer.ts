@@ -22,14 +22,22 @@ function ApplyTheme(theme: "dark" | "light" = "light") {
 	}
 }
 
+// 导航到指定URL
+function GotoUrl(url: string = "") {
+	if (!url.startsWith("http://") && !url.startsWith("https://")) {
+		url = "https://" + url;
+	}
+	urlInput.value = url;
+	webviewA.src = url;
+	webviewB.src = url;
+}
+
 // 设置事件监听器
 function SetupEventListeners() {
 	// 回车导航
 	urlInput.addEventListener("keypress", e => {
-		if (e.key === "Enter") {
-			const url = urlInput.value.trim();
-			!!url && GotoUrl(url);
-		}
+		const url = urlInput.value.trim();
+		e.key === "Enter" && !!url && GotoUrl(url);
 	});
 	// 导航按钮
 	goBtn.addEventListener("click", () => {
@@ -66,23 +74,6 @@ function SetupEventListeners() {
 		backBtn.disabled = !webviewA.canGoBack();
 		forwardBtn.disabled = !webviewA.canGoForward();
 	});
-	// 从主进程接收URL导航请求
-	window.electronAPI.onLoadUrl(url => GotoUrl(url));
-}
-
-// 导航到指定URL
-function GotoUrl(url: string = "") {
-	// 确保URL格式正确
-	if (!url.startsWith("http://") && !url.startsWith("https://")) {
-		url = "https://" + url;
-	}
-	// 更新输入框
-	urlInput.value = url;
-	// 导航两个webview
-	webviewA.src = url;
-	webviewB.src = url;
-	// 通知主进程当前导航的URL（可选，取决于是否需要主进程知道当前URL）
-	window.electronAPI.navigate(url);
 }
 
 // 初始化应用
@@ -95,6 +86,7 @@ function InitApp() {
 	themeBtn = document.getElementById("theme-btn") as HTMLButtonElement;
 	webviewA = document.getElementById("webview-a") as Electron.WebviewTag;
 	webviewB = document.getElementById("webview-b") as Electron.WebviewTag;
+	console.log("Chrome Version: ", window.eapi.chromeVer());
 	ApplyTheme(currTheme);
 	SetupEventListeners();
 	GotoUrl("https://baidu.com");

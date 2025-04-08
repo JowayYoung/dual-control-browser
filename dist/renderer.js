@@ -20,12 +20,18 @@ function ApplyTheme(theme = "light") {
         themeIcon.textContent = "dark_mode";
     }
 }
+function GotoUrl(url = "") {
+    if (!url.startsWith("http://") && !url.startsWith("https://")) {
+        url = "https://" + url;
+    }
+    urlInput.value = url;
+    webviewA.src = url;
+    webviewB.src = url;
+}
 function SetupEventListeners() {
     urlInput.addEventListener("keypress", e => {
-        if (e.key === "Enter") {
-            const url = urlInput.value.trim();
-            !!url && GotoUrl(url);
-        }
+        const url = urlInput.value.trim();
+        e.key === "Enter" && !!url && GotoUrl(url);
     });
     goBtn.addEventListener("click", () => {
         const url = urlInput.value.trim();
@@ -56,16 +62,6 @@ function SetupEventListeners() {
         backBtn.disabled = !webviewA.canGoBack();
         forwardBtn.disabled = !webviewA.canGoForward();
     });
-    window.electronAPI.onLoadUrl(url => GotoUrl(url));
-}
-function GotoUrl(url = "") {
-    if (!url.startsWith("http://") && !url.startsWith("https://")) {
-        url = "https://" + url;
-    }
-    urlInput.value = url;
-    webviewA.src = url;
-    webviewB.src = url;
-    window.electronAPI.navigate(url);
 }
 function InitApp() {
     urlInput = document.getElementById("url-input");
@@ -76,6 +72,7 @@ function InitApp() {
     themeBtn = document.getElementById("theme-btn");
     webviewA = document.getElementById("webview-a");
     webviewB = document.getElementById("webview-b");
+    console.log("Chrome Version: ", window.eapi.chromeVer());
     ApplyTheme(currTheme);
     SetupEventListeners();
     GotoUrl("https://baidu.com");

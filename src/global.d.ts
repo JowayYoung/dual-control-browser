@@ -1,6 +1,7 @@
-interface ElectronAPI {
-	navigate: (url: string) => void
-	onLoadUrl: (callback: (url: string) => void) => () => void
+interface Eapi {
+	chromeVer: () => string
+	electronVer: () => string
+	nodeVer: () => string
 }
 
 interface TailwindConfig {
@@ -16,7 +17,7 @@ interface TailwindConfig {
 }
 
 declare interface Window {
-	electronAPI: ElectronAPI
+	eapi: Eapi
 	tailwind: {
 		config: TailwindConfig
 	}

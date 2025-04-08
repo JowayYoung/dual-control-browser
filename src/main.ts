@@ -1,7 +1,7 @@
-import { BrowserWindow, app, ipcMain } from "electron";
-import { dirname, join } from "path";
-import { platform } from "process";
-import { fileURLToPath } from "url";
+import { dirname, join } from "node:path";
+import { platform } from "node:process";
+import { fileURLToPath } from "node:url";
+import { BrowserWindow, app } from "electron";
 
 // 获取__dirname
 const __filename = fileURLToPath(import.meta.url);
@@ -39,7 +39,7 @@ app.whenReady().then(() => {
 	CreateWindow();
 	app.on("activate", () => {
 		// 在MacOS中点击Dock且没有其他窗口打开时，通常在应用程序中重新创建一个窗口
-		BrowserWindow.getAllWindows().length === 0 && CreateWindow();
+		!BrowserWindow.getAllWindows().length && CreateWindow();
 	});
 });
 
@@ -47,10 +47,4 @@ app.whenReady().then(() => {
 app.on("window-all-closed", () => {
 	// 在MacOS中除非用户使用Cmd+Q明确退出，否则应用及其菜单栏通常会保持活动状态
 	platform !== "darwin" && app.quit();
-});
-
-// 处理导航请求
-ipcMain.on("navigate", (e, url) => {
-	// 将URL发送到渲染进程
-	!!mainWindow && mainWindow.webContents.send("load-url", url);
 });

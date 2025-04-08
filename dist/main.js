@@ -1,7 +1,7 @@
-import { BrowserWindow, app, ipcMain } from "electron";
-import { dirname, join } from "path";
-import { platform } from "process";
-import { fileURLToPath } from "url";
+import { dirname, join } from "node:path";
+import { platform } from "node:process";
+import { fileURLToPath } from "node:url";
+import { BrowserWindow, app } from "electron";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 let mainWindow = null;
@@ -26,12 +26,9 @@ function CreateWindow() {
 app.whenReady().then(() => {
     CreateWindow();
     app.on("activate", () => {
-        BrowserWindow.getAllWindows().length === 0 && CreateWindow();
+        !BrowserWindow.getAllWindows().length && CreateWindow();
     });
 });
 app.on("window-all-closed", () => {
     platform !== "darwin" && app.quit();
-});
-ipcMain.on("navigate", (e, url) => {
-    !!mainWindow && mainWindow.webContents.send("load-url", url);
 });
