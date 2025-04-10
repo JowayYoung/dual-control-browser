@@ -36,7 +36,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 		const pages = await browser.pages();
 		const page = pages[0]; // 使用第一个打开的页面
 		// 检测是否已经登录（判断是否存在额度信息）
-		await WaitFor(2000);
+		await WaitFor(3000);
 		const limitSelector = ".second-header .limit .limit-box"; // 额度
 		const isLimitVisible = await CheckElemVisible(page, limitSelector);
 		if (isLimitVisible) {
@@ -68,11 +68,8 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				const sliderSelector = ".nc-container .nc_scale .btn_slide"; // 滑块
 				const sliderFlagSelector = ".nc-container .nc_scale .btn_ok"; // 滑块标记
 				const sliderCtnSelector = ".nc_scale"; // 滑块容器
-				// 等待账号输入框出现并输入
-				await page.waitForSelector(accountInputSelector);
+				// 输入账号密码
 				await page.type(accountInputSelector, ACCOUNT, { delay: 50 });
-				// 等待密码输入框出现并输入
-				await page.waitForSelector(passswordInputSelector);
 				await page.type(passswordInputSelector, PASSWORD, { delay: 50 });
 				// 等待滑块元素出现并拖动
 				await page.waitForSelector(sliderSelector);
@@ -90,7 +87,6 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				// 等待滑块标记与登录按钮出现并登录
 				try {
 					await page.waitForSelector(sliderFlagSelector);
-					await page.waitForSelector(loginBtnSelector);
 					await page.click(loginBtnSelector);
 					await page.waitForNavigation({ waitUntil: "networkidle0" });
 				} catch (e) {
@@ -112,8 +108,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				const { name, price } = product;
 				const searchInputSelector = ".menu-bar .menu-box .handle .search-box .search .input"; // 搜索输入框
 				const searchResultSelector = ".search-list .main .detail"; // 搜索结果
-				// 等待搜索输入框出现，先清空再输入
-				await page.waitForSelector(searchInputSelector);
+				// 先清空再输入后搜索
 				await page.$eval(searchInputSelector, el => {
 					const elem = el as HTMLInputElement;
 					elem.value = "";
@@ -121,14 +116,15 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				await page.type(searchInputSelector, name);
 				await page.keyboard.press("Enter");
 				// 等待搜索结果出现并加购
-				try {
-					await page.waitForSelector(searchResultSelector, { timeout: 2000 });
+				await WaitFor(2000);
+				const isSearchResultVisible = await CheckElemVisible(page, searchResultSelector);
+				if (isSearchResultVisible) {
 					console.log("-----", greenBright("搜索成功："), name, "-----");
 					const productListSelector = ".product-list .item .single-product"; // 商品列表
 					const products = await page.$$eval(productListSelector, productElems => {
 						return productElems.map(v => {
 							const nameElem = v.querySelector(".info .name-cn");
-							const priceElem = v.querySelector(".info .price .sale p:last-child");
+							const priceElem = v.querySelector(".info .price .sale .num:last-of-type");
 							return {
 								isSellout: v.classList.contains("sellOut"),
 								name: nameElem?.textContent?.trim() || "",
@@ -140,14 +136,15 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 					console.log(blueBright("是否有货："), goodsIndex === -1 ? redBright("无货") : greenBright("有货"));
 					console.log(blueBright("商品顺序："), goodsIndex);
 					await WaitFor(2000);
-				} catch (e) {
+				} else {
 					console.log("-----", redBright("搜索失败："), name, "-----");
-					console.error(e);
 					await WaitFor(2000);
 				}
 			}
 		}
 		// 完成流程断开浏览器
+		const homeBtnSelector = ".menu-bar .menu-box .menu-list .item:first-of-type"; // 首页按钮
+		await page.click(homeBtnSelector);
 		await browser.disconnect();
 	} catch (err) {
 		console.error("打开页面发生错误:", err);
