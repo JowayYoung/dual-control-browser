@@ -3,6 +3,13 @@ const WEBSITE = "https://www.loreal-boutique.com/";
 const ACCOUNT = "00837444";
 const PASSWORD = "FS9659JL";
 
+// const PRODUCTS = `
+// 兰蔻新菁纯精华粉底液(35ml) 100/110 297*5
+// --------------------
+// AGE面霜 48ml 564*1
+// 阿玛尼轻垫菁华粉底液(15g) 2/3 135*1
+// `;
+
 const PRODUCTS = `
 兰蔻新菁纯精华粉底液(35ml) 100/110 297*5
 兰蔻XXX 100/110 297*5

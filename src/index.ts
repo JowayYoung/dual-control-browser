@@ -66,6 +66,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				const passswordInputSelector = ".login .main .container .inputbox.pass .input"; // 密码输入框
 				const loginBtnSelector = ".login .main .container .submit"; // 登录按钮
 				const sliderSelector = ".nc-container .nc_scale .btn_slide"; // 滑块
+				const sliderFlagSelector = ".nc-container .nc_scale .btn_ok"; // 滑块标记
 				const sliderCtnSelector = ".nc_scale"; // 滑块容器
 				// 等待账号输入框出现并输入
 				await page.waitForSelector(accountInputSelector);
@@ -83,26 +84,32 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				if (!!sliderBox && !!sliderCtnBox) {
 					await page.mouse.move(sliderBox.x + sliderBox.width / 2, sliderBox.y + sliderBox.height / 2);
 					await page.mouse.down();
-					await page.mouse.move(sliderCtnBox.x + sliderCtnBox.width, sliderBox.y + sliderBox.height / 2, {
-						steps: 20 // 分步移动，使得移动更加自然
-					});
+					await page.mouse.move(sliderCtnBox.x + sliderCtnBox.width, sliderBox.y + sliderBox.height / 2, { steps: 20 });
 					await page.mouse.up();
 				}
-				// 等待登录按钮出现并点击
-				await WaitFor(2000);
-				await page.waitForSelector(loginBtnSelector);
-				await page.click(loginBtnSelector);
-				await page.waitForNavigation({ waitUntil: "networkidle0" });
+				// 等待滑块标记与登录按钮出现并登录
+				try {
+					await page.waitForSelector(sliderFlagSelector);
+					await page.waitForSelector(loginBtnSelector);
+					await page.click(loginBtnSelector);
+					await page.waitForNavigation({ waitUntil: "networkidle0" });
+				} catch (e) {
+					console.log(magentaBright("系统提示："), yellowBright("未检测到滑块确认按钮，登录失败"), e);
+				}
 			}
 			await loginUser();
-			await WaitFor(2000);
-			console.log(magentaBright("系统提示："), blueBright("登录成功"));
+			try {
+				await page.waitForSelector(limitSelector);
+				console.log(magentaBright("系统提示："), greenBright("登录成功"));
+			} catch (e) {
+				console.log(magentaBright("系统提示："), redBright("登录失败"), e);
+			}
 		}
 		// 格式化产品信息
 		const products = ParseProducts(PRODUCTS);
 		for (const group of products) {
 			for (const product of group) {
-				const { name } = product;
+				const { name, price } = product;
 				const searchInputSelector = ".menu-bar .menu-box .handle .search-box .search .input"; // 搜索输入框
 				const searchResultSelector = ".search-list .main .detail"; // 搜索结果
 				// 等待搜索输入框出现，先清空再输入
@@ -113,20 +120,34 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				});
 				await page.type(searchInputSelector, name);
 				await page.keyboard.press("Enter");
-				// 等待搜索结果出现
-				await WaitFor(2000);
-				const isSearchResultVisible = await CheckElemVisible(page, searchResultSelector);
-				if (isSearchResultVisible) {
-					console.log(greenBright("搜索成功："), name);
+				// 等待搜索结果出现并加购
+				try {
+					await page.waitForSelector(searchResultSelector, { timeout: 2000 });
+					console.log("-----", greenBright("搜索成功："), name, "-----");
+					const productListSelector = ".product-list .item .single-product"; // 商品列表
+					const products = await page.$$eval(productListSelector, productElems => {
+						return productElems.map(v => {
+							const nameElem = v.querySelector(".info .name-cn");
+							const priceElem = v.querySelector(".info .price .sale p:last-child");
+							return {
+								isSellout: v.classList.contains("sellOut"),
+								name: nameElem?.textContent?.trim() || "",
+								price: +(priceElem?.textContent?.trim() || "")
+							};
+						});
+					});
+					const goodsIndex = products.findIndex(v => v.name.includes(name) && v.price === price && !v.isSellout);
+					console.log(blueBright("是否有货："), goodsIndex === -1 ? redBright("无货") : greenBright("有货"));
+					console.log(blueBright("商品顺序："), goodsIndex);
 					await WaitFor(2000);
-				} else {
-					console.log(redBright("搜索失败："), name);
+				} catch (e) {
+					console.log("-----", redBright("搜索失败："), name, "-----");
+					console.error(e);
 					await WaitFor(2000);
 				}
 			}
 		}
-		// 等待一段时间断开浏览器
-		await WaitFor(5000);
+		// 完成流程断开浏览器
 		await browser.disconnect();
 	} catch (err) {
 		console.error("打开页面发生错误:", err);
