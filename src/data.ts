@@ -1,5 +1,14 @@
+import type { WaitForSelectorOptions } from "puppeteer-core";
+
+// 配置
+const OPTS_WAITFOT_SELECTOR: WaitForSelectorOptions = {
+	timeout: 3000,
+	visible: true
+};
+
 const WEBSITE = "https://www.loreal-boutique.com/";
 
+// 数据
 const ACCOUNT = "00837444";
 const PASSWORD = "FS9659JL";
 
@@ -41,6 +50,7 @@ AGE面霜 48ml 564*1
 
 export {
 	ACCOUNT,
+	OPTS_WAITFOT_SELECTOR,
 	PASSWORD,
 	PRODUCTS,
 	WEBSITE

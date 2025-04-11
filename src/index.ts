@@ -2,7 +2,7 @@ import { WaitFor } from "@yangzw/bruce-us";
 import Chalk from "chalk";
 import { connect } from "puppeteer-core";
 
-import { ACCOUNT, PASSWORD, PRODUCTS } from "./data";
+import { ACCOUNT, OPTS_WAITFOT_SELECTOR, PASSWORD, PRODUCTS } from "./data";
 import { CheckElemVisible, ParseProducts } from "./util";
 
 const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chalk;
@@ -36,13 +36,13 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 		const pages = await browser.pages();
 		const page = pages[0]; // 使用第一个打开的页面
 		// 检测是否已经登录（判断是否存在额度信息）
-		await WaitFor(3000);
 		const limitSelector = ".second-header .limit .limit-box"; // 额度
-		const isLimitVisible = await CheckElemVisible(page, limitSelector);
-		if (isLimitVisible) {
+		try {
+			await page.waitForSelector(limitSelector, OPTS_WAITFOT_SELECTOR);
 			console.log(blueBright("登录状态："), greenBright("已登录"));
-		} else {
+		} catch (e) {
 			console.log(blueBright("登录状态："), yellowBright("未登录，正在尝试登录"));
+			console.error(e);
 			// 循环检测并点击弹窗按钮，直到弹窗消失
 			async function closePopup() {
 				const confirmPopupSelector = ".pop-salerule2 .salerule-box"; // 确认弹窗
@@ -72,8 +72,8 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				await page.type(accountInputSelector, ACCOUNT, { delay: 50 });
 				await page.type(passswordInputSelector, PASSWORD, { delay: 50 });
 				// 等待滑块元素出现并拖动
-				await page.waitForSelector(sliderSelector);
-				await page.waitForSelector(sliderCtnSelector);
+				await page.waitForSelector(sliderSelector, OPTS_WAITFOT_SELECTOR);
+				await page.waitForSelector(sliderCtnSelector, OPTS_WAITFOT_SELECTOR);
 				const slider = await page.$(sliderSelector);
 				const sliderCtn = await page.$(sliderCtnSelector);
 				const sliderBox = await slider?.boundingBox();
@@ -86,7 +86,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				}
 				// 等待滑块标记与登录按钮出现并登录
 				try {
-					await page.waitForSelector(sliderFlagSelector);
+					await page.waitForSelector(sliderFlagSelector, OPTS_WAITFOT_SELECTOR);
 					await page.click(loginBtnSelector);
 					await page.waitForNavigation({ waitUntil: "networkidle0" });
 				} catch (e) {
@@ -95,7 +95,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 			}
 			await loginUser();
 			try {
-				await page.waitForSelector(limitSelector);
+				await page.waitForSelector(limitSelector, OPTS_WAITFOT_SELECTOR);
 				console.log(magentaBright("系统提示："), greenBright("登录成功"));
 			} catch (e) {
 				console.log(magentaBright("系统提示："), redBright("登录失败"), e);
@@ -143,6 +143,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 			}
 		}
 		// 完成流程断开浏览器
+		await WaitFor(2000);
 		const homeBtnSelector = ".menu-bar .menu-box .menu-list .item:first-of-type"; // 首页按钮
 		await page.click(homeBtnSelector);
 		await browser.disconnect();
