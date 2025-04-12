@@ -103,9 +103,9 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 		const searchResultSelector = ".search-list .main .detail"; // 搜索结果
 		for (const group of products) {
 			for (const product of group) {
-				const { name, price } = product;
-				await page.$eval(searchInputSelector, el => {
-					const elem = el as HTMLInputElement;
+				const { count, name, price, specs } = product;
+				await page.$eval(searchInputSelector, e => {
+					const elem = e as HTMLInputElement;
 					elem.value = "";
 				});
 				await page.type(searchInputSelector, name);
@@ -114,9 +114,9 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 				const isSearchResultVisible = await CheckElemVisible(page, searchResultSelector);
 				if (isSearchResultVisible) {
 					console.log("-----", greenBright("搜索成功："), name, "-----");
-					const productListSelector = ".product-list .item .single-product"; // 商品列表
-					const products = await page.$$eval(productListSelector, productElems => {
-						return productElems.map(v => {
+					const productsSelector = ".product-list .item .single-product"; // 商品列表
+					const products = await page.$$eval(productsSelector, elem => {
+						return elem.map(v => {
 							const nameElem = v.querySelector(".info .name-cn");
 							const priceElem = v.querySelector(".info .price .sale .num:last-of-type");
 							return {
@@ -128,7 +128,42 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 					});
 					const goodsIndex = products.findIndex(v => v.name.includes(name) && v.price === price && !v.isSellout);
 					console.log(blueBright("是否有货："), goodsIndex === -1 ? redBright("无货") : greenBright("有货"));
-					console.log(blueBright("商品顺序："), goodsIndex);
+					if (goodsIndex > -1) {
+						const productItemSelector = `.product-list .item:nth-of-type(${goodsIndex + 1}) .single-product`; // 商品项目
+						const productCloseBtnSelector = ".pop-skusel .skusel-box .close"; // 商品关闭按钮
+						const productSpecsSelector = ".pop-skusel .skusel-box .detail .spec .list .item.selected"; // 商品规格列表
+						const productAddBtnSelector = ".pop-skusel .skusel-box .detail .operate .symbol:nth-of-type(2)"; // 商品增加按钮
+						const productCountSelector = ".pop-skusel .skusel-box .detail .operate .input"; // 商品数量
+						const productCartBtnSelector = ".pop-skusel .skusel-box .detail .btn-box .btn.add-cart"; // 商品加购按钮
+						const productToastSelector = ".custom-toast"; // 商品提示
+						await page.click(productItemSelector);
+						await WaitFor();
+						const productSpecs = await page.$$eval(productSpecsSelector, elem => elem.map(e => e.textContent?.trim() || ""));
+						console.log("目标规格", specs);
+						console.log("当前规格", productSpecs);
+						for (const index in productSpecs) {
+							const productSpec = productSpecs[index];
+							if (specs.includes(productSpec)) {
+								const productSpecItemSelector = `.pop-skusel .skusel-box .detail .spec .list .item.selected:nth-of-type(${+index + 1})`; // 商品规格项目
+								await page.click(productSpecItemSelector);
+								await WaitFor(100);
+								// 获取商品数量输入框中的数值
+								const productCount = await page.$eval(productCountSelector, e => {
+									const elem = e as HTMLInputElement;
+									return +elem.value;
+								});
+								const diffCount = count - productCount;
+								for (let i = 0; i < diffCount; i++) {
+									await page.click(productAddBtnSelector);
+									await WaitFor(100);
+								}
+								await page.click(productCartBtnSelector);
+								await page.waitForSelector(productToastSelector, OPTS_WAITFOT_SELECTOR);
+							}
+						}
+						await WaitFor(2000);
+						await page.click(productCloseBtnSelector);
+					}
 				} else {
 					console.log("-----", redBright("搜索失败："), name, "-----");
 				}
