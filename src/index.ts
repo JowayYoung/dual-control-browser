@@ -23,8 +23,8 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 	// });
 	// B: 使用已经打开的Chrome
 	const browser = await connect({
-		// MacOS：终端执行`/Applications/Chrome.app/Contents/MacOS/Google\ Chrome --remote-debugging-port=9222`
-		// Windows：终端执行`C:\Program Files\Google\Chrome\Application\chrome.exe --remote-debugging-port=9222`
+		// MacOS：终端执行`npm run open:mac`
+		// Windows：终端执行`npm run open:windows`
 		browserURL: "http://localhost:9222",
 		defaultViewport: null
 	});
@@ -44,7 +44,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 			console.log(blueBright("登录状态："), yellowBright("未登录，正在尝试登录"));
 			console.error(e);
 			// 循环检测并点击弹窗按钮，直到弹窗消失
-			async function closePopup() {
+			const closePopup = async function() {
 				const confirmPopupSelector = ".pop-salerule2 .salerule-box"; // 确认弹窗
 				const confirmBtnSelector = ".pop-salerule2 .salerule-box .btn-box .btn.confirm"; // 确认按钮
 				while (true) {
@@ -58,42 +58,37 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 						await WaitFor(2000);
 					}
 				}
-			}
+			};
 			await closePopup();
-			// 输入账号密码，滑动滑块，进入首页
-			async function loginUser() {
-				const accountInputSelector = ".login .main .container .inputbox.user .input"; // 账号输入框
-				const passswordInputSelector = ".login .main .container .inputbox.pass .input"; // 密码输入框
-				const loginBtnSelector = ".login .main .container .submit"; // 登录按钮
-				const sliderSelector = ".nc-container .nc_scale .btn_slide"; // 滑块
-				const sliderFlagSelector = ".nc-container .nc_scale .btn_ok"; // 滑块标记
-				const sliderCtnSelector = ".nc_scale"; // 滑块容器
-				// 输入账号密码
-				await page.type(accountInputSelector, ACCOUNT, { delay: 50 });
-				await page.type(passswordInputSelector, PASSWORD, { delay: 50 });
-				// 等待滑块元素出现并拖动
-				await page.waitForSelector(sliderSelector, OPTS_WAITFOT_SELECTOR);
-				await page.waitForSelector(sliderCtnSelector, OPTS_WAITFOT_SELECTOR);
-				const slider = await page.$(sliderSelector);
-				const sliderCtn = await page.$(sliderCtnSelector);
-				const sliderBox = await slider?.boundingBox();
-				const sliderCtnBox = await sliderCtn?.boundingBox();
-				if (!!sliderBox && !!sliderCtnBox) {
-					await page.mouse.move(sliderBox.x + sliderBox.width / 2, sliderBox.y + sliderBox.height / 2);
-					await page.mouse.down();
-					await page.mouse.move(sliderCtnBox.x + sliderCtnBox.width, sliderBox.y + sliderBox.height / 2, { steps: 20 });
-					await page.mouse.up();
-				}
-				// 等待滑块标记与登录按钮出现并登录
-				try {
-					await page.waitForSelector(sliderFlagSelector, OPTS_WAITFOT_SELECTOR);
-					await page.click(loginBtnSelector);
-					await page.waitForNavigation({ waitUntil: "networkidle0" });
-				} catch (e) {
-					console.log(magentaBright("系统提示："), yellowBright("未检测到滑块确认按钮，登录失败"), e);
-				}
+			// 输入账号密码，滑动滑块，点击登录，进入首页
+			const accountInputSelector = ".login .main .container .inputbox.user .input"; // 账号输入框
+			const passswordInputSelector = ".login .main .container .inputbox.pass .input"; // 密码输入框
+			const loginBtnSelector = ".login .main .container .submit"; // 登录按钮
+			const sliderSelector = ".nc-container .nc_scale .btn_slide"; // 滑块
+			const sliderFlagSelector = ".nc-container .nc_scale .btn_ok"; // 滑块标记
+			const sliderCtnSelector = ".nc_scale"; // 滑块容器
+			await page.type(accountInputSelector, ACCOUNT, { delay: 50 });
+			await page.type(passswordInputSelector, PASSWORD, { delay: 50 });
+			await page.waitForSelector(sliderSelector, OPTS_WAITFOT_SELECTOR);
+			await page.waitForSelector(sliderCtnSelector, OPTS_WAITFOT_SELECTOR);
+			const slider = await page.$(sliderSelector);
+			const sliderCtn = await page.$(sliderCtnSelector);
+			const sliderBox = await slider?.boundingBox();
+			const sliderCtnBox = await sliderCtn?.boundingBox();
+			if (!!sliderBox && !!sliderCtnBox) {
+				await page.mouse.move(sliderBox.x + sliderBox.width / 2, sliderBox.y + sliderBox.height / 2);
+				await page.mouse.down();
+				await page.mouse.move(sliderCtnBox.x + sliderCtnBox.width, sliderBox.y + sliderBox.height / 2, { steps: 20 });
+				await page.mouse.up();
 			}
-			await loginUser();
+			try {
+				await page.waitForSelector(sliderFlagSelector, OPTS_WAITFOT_SELECTOR);
+				await page.click(loginBtnSelector);
+				await page.waitForNavigation({ waitUntil: "networkidle0" });
+			} catch (e) {
+				console.log(magentaBright("系统提示："), yellowBright("未检测到滑块确认按钮，登录失败"), e);
+			}
+			// 确认是否登录成功
 			try {
 				await page.waitForSelector(limitSelector, OPTS_WAITFOT_SELECTOR);
 				console.log(magentaBright("系统提示："), greenBright("登录成功"));
@@ -103,19 +98,18 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 		}
 		// 格式化产品信息
 		const products = ParseProducts(PRODUCTS);
+		// 搜索商品，对于满足条件的商品进行加购
+		const searchInputSelector = ".menu-bar .menu-box .handle .search-box .search .input"; // 搜索输入框
+		const searchResultSelector = ".search-list .main .detail"; // 搜索结果
 		for (const group of products) {
 			for (const product of group) {
 				const { name, price } = product;
-				const searchInputSelector = ".menu-bar .menu-box .handle .search-box .search .input"; // 搜索输入框
-				const searchResultSelector = ".search-list .main .detail"; // 搜索结果
-				// 先清空再输入后搜索
 				await page.$eval(searchInputSelector, el => {
 					const elem = el as HTMLInputElement;
 					elem.value = "";
 				});
 				await page.type(searchInputSelector, name);
 				await page.keyboard.press("Enter");
-				// 等待搜索结果出现并加购
 				await WaitFor(2000);
 				const isSearchResultVisible = await CheckElemVisible(page, searchResultSelector);
 				if (isSearchResultVisible) {
@@ -135,11 +129,10 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 					const goodsIndex = products.findIndex(v => v.name.includes(name) && v.price === price && !v.isSellout);
 					console.log(blueBright("是否有货："), goodsIndex === -1 ? redBright("无货") : greenBright("有货"));
 					console.log(blueBright("商品顺序："), goodsIndex);
-					await WaitFor(2000);
 				} else {
 					console.log("-----", redBright("搜索失败："), name, "-----");
-					await WaitFor(2000);
 				}
+				await WaitFor(2000);
 			}
 		}
 		// 完成流程断开浏览器
