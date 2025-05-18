@@ -58,7 +58,7 @@ export default async function LoginAccount(page: Page): Promise<void> {
 			await page.click(loginBtnSelector);
 			await page.waitForNavigation({ waitUntil: "networkidle0" });
 		} catch (e) {
-			console.log(magentaBright("系统提示："), yellowBright("未检测到滑块确认按钮，登录失败"), e);
+			console.log(magentaBright("系统提示："), redBright("未检测到滑块确认按钮，登录失败"), e);
 		}
 		// 确认是否登录成功
 		try {

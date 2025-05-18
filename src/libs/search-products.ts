@@ -17,8 +17,7 @@ export default async function SearchProducts(page: Page): Promise<void> {
 			const { count, name, price, specs } = product;
 			// 清空搜索框
 			await page.$eval(searchInputSelector, e => {
-				const elem = e as HTMLInputElement;
-				elem.value = "";
+				(e as HTMLInputElement).value = "";
 			});
 			await page.type(searchInputSelector, name);
 			await page.keyboard.press("Enter");
@@ -27,7 +26,7 @@ export default async function SearchProducts(page: Page): Promise<void> {
 			if (isSearchResultVisible) {
 				console.log("-----", greenBright("搜索成功："), name, "-----");
 				const productsSelector = ".product-list .item .single-product"; // 商品列表
-				const products = await page.$$eval(productsSelector, elem => elem.map(v => {
+				const products = await page.$$eval(productsSelector, e => e.map(v => {
 					const nameElem = v.querySelector(".info .name-cn");
 					const priceElem = v.querySelector(".info .price .sale .num:last-of-type");
 					return {
@@ -48,7 +47,7 @@ export default async function SearchProducts(page: Page): Promise<void> {
 					const productToastSelector = ".custom-toast"; // 商品提示
 					await page.click(productItemSelector);
 					await WaitFor();
-					const productSpecs = await page.$$eval(productSpecsSelector, elem => elem.map(e => e.textContent?.trim() ?? ""));
+					const productSpecs = await page.$$eval(productSpecsSelector, e => e.map(el => el.textContent?.trim() ?? ""));
 					console.log("目标规格", specs);
 					console.log("当前规格", productSpecs);
 					for (const [i, v] of productSpecs.entries()) {
@@ -57,10 +56,7 @@ export default async function SearchProducts(page: Page): Promise<void> {
 							await page.click(productSpecItemSelector);
 							await WaitFor(100);
 							// 获取商品数量输入框中的数值
-							const productCount = await page.$eval(productCountSelector, e => {
-								const elem = e as HTMLInputElement;
-								return +elem.value;
-							});
+							const productCount = await page.$eval(productCountSelector, e => +(e as HTMLInputElement).value);
 							const diffCount = count - productCount;
 							for (let i = 0; i < diffCount; i++) {
 								await page.click(productAddBtnSelector);
