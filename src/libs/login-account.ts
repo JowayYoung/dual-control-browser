@@ -11,7 +11,7 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 const SELECTOR = {
 	accountInput: ".login .main .container .inputbox.user .input", // 账号输入框
 	confirmBtn: ".salerule-box .btn-box .btn.confirm", // 确认按钮
-	confirmPopup: ".salerule-box", // 确认弹窗
+	confirmPop: ".salerule-box", // 确认弹窗
 	limitInfo: ".second-header .limit .limit-box", // 额度信息
 	loginBtn: ".login .main .container .submit", // 登录按钮
 	passwordInput: ".login .main .container .inputbox.pass .input", // 密码输入框
@@ -22,7 +22,7 @@ const SELECTOR = {
 
 async function CloseConfirmPopup(page: Page): Promise<void> {
 	try {
-		await page.waitForSelector(SELECTOR.confirmPopup, { ...WAITFOT_OPT, timeout: 100000 });
+		await page.waitForSelector(SELECTOR.confirmPop, { ...WAITFOT_OPT, timeout: 100000 });
 		await page.waitForSelector(SELECTOR.confirmBtn, { ...WAITFOT_OPT, timeout: 100000 });
 		await page.click(SELECTOR.confirmBtn);
 	} catch {
@@ -31,7 +31,7 @@ async function CloseConfirmPopup(page: Page): Promise<void> {
 }
 
 // 检测是否已经登录（判断是否存在额度信息）
-export default async function LoginAccount(page: Page): Promise<void> {
+export default async function LoginAccount(page: Page): Promise<boolean> {
 	// 1. 检查登录状态
 	try {
 		await page.waitForSelector(SELECTOR.limitInfo, WAITFOT_OPT);
@@ -58,23 +58,24 @@ export default async function LoginAccount(page: Page): Promise<void> {
 		try {
 			await page.waitForSelector(SELECTOR.sliderFlag, WAITFOT_OPT);
 		} catch {
-			console.log(magentaBright("系统提示："), redBright("登录失败，未检测到滑块标记按钮"));
-			return;
+			console.log(magentaBright("系统提示："), redBright("登录失败，未检测到滑块标记"));
+			return false;
 		}
 		// 5. 点击登录按钮
 		await page.click(SELECTOR.loginBtn);
-		await page.waitForNavigation({ waitUntil: "networkidle0" });
 		// 6. 检查登录状态
 		try {
 			await page.waitForSelector(SELECTOR.limitInfo, WAITFOT_OPT);
 			console.log(magentaBright("系统提示："), greenBright("登录成功"));
 		} catch {
-			console.log(magentaBright("系统提示："), redBright("登录失败"));
-			return;
+			console.log(magentaBright("系统提示："), redBright("登录失败，未检测到额度信息"));
+			return false;
 		}
 	}
 	// 7. 检测确认弹窗并关闭
 	await WaitFor();
-	const isPopupVisible = await CheckElemVisible(page, SELECTOR.confirmPopup);
+	const isPopupVisible = await CheckElemVisible(page, SELECTOR.confirmPop);
 	isPopupVisible && await CloseConfirmPopup(page);
+	console.log(magentaBright("系统提示："), greenBright("进入首页"));
+	return true;
 }

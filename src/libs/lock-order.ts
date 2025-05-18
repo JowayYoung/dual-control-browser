@@ -9,7 +9,7 @@ const { blueBright, greenBright, magentaBright, redBright } = Chalk;
 const SELECTOR = {
 	cartBtn: ".menu-bar .menu-box .handle .cart-box .cart", // 购物车按钮
 	checkoutBtn: ".cart-list .content .footer .footer-right .submit", // 结算按钮
-	checkoutToast: ".custom-toast", // 结算提示
+	checkoutMsg: ".custom-toast", // 结算提示
 	homeBtn: ".menu-bar .menu-box .menu-list .item:first-of-type" // 首页按钮
 };
 
@@ -30,7 +30,7 @@ export default async function LockOrder(page: Page, index = 1): Promise<void> {
 		await WaitFor();
 		// 4. 等待结算结果（等待可见）
 		try {
-			await page.waitForSelector(SELECTOR.checkoutToast, WAITFOT_OPT);
+			await page.waitForSelector(SELECTOR.checkoutMsg, WAITFOT_OPT);
 			console.log(magentaBright("系统提示："), redBright("锁单失败，额度受限"));
 		} catch (error) {
 			// 如果没有等到结算提示，认为锁单成功

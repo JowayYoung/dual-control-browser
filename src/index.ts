@@ -16,7 +16,8 @@ const { magentaBright } = Chalk;
 		console.log(magentaBright("-----浏览器已连接-----"));
 		const pages = await browser.pages();
 		const page = pages[0]; // 使用第一个打开的页面
-		await LoginAccount(page);
+		const flag = await LoginAccount(page);
+		console.log("登录状态", flag);
 		// await LockOrder(page);
 		await browser.disconnect();
 		console.log(magentaBright("-----浏览器已断开-----"));
