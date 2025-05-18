@@ -2,7 +2,7 @@ import type { Page } from "puppeteer-core";
 import { WaitFor } from "@yangzw/bruce-us";
 import Chalk from "chalk";
 
-import { OPTS_WAITFOT_SELECTOR, PRODUCTS, CheckElemVisible, ParseProducts } from "../utils";
+import { PRODUCTS, WAITFOT_OPT, CheckElemVisible, ParseProducts } from "../utils";
 
 const { blueBright, greenBright, redBright } = Chalk;
 
@@ -63,7 +63,7 @@ export default async function SearchProducts(page: Page): Promise<void> {
 								await WaitFor(100);
 							}
 							await page.click(productCartBtnSelector);
-							await page.waitForSelector(productToastSelector, OPTS_WAITFOT_SELECTOR);
+							await page.waitForSelector(productToastSelector, WAITFOT_OPT);
 						}
 					}
 					await WaitFor(2000);

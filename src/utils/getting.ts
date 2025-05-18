@@ -1,7 +1,7 @@
 import type { WaitForSelectorOptions } from "puppeteer-core";
 
 // 配置
-const OPTS_WAITFOT_SELECTOR: WaitForSelectorOptions = {
+const WAITFOT_OPT: WaitForSelectorOptions = {
 	timeout: 3000,
 	visible: true
 };
@@ -51,8 +51,8 @@ const PRODUCTS = `
 
 export {
 	ACCOUNT,
-	OPTS_WAITFOT_SELECTOR,
 	PASSWORD,
 	PRODUCTS,
+	WAITFOT_OPT,
 	WEBSITE
 };

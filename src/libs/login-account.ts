@@ -2,7 +2,7 @@ import type { Page } from "puppeteer-core";
 import { WaitFor } from "@yangzw/bruce-us";
 import Chalk from "chalk";
 
-import { ACCOUNT, OPTS_WAITFOT_SELECTOR, PASSWORD, CheckElemVisible } from "../utils";
+import { ACCOUNT, PASSWORD, WAITFOT_OPT, CheckElemVisible } from "../utils";
 
 const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chalk;
 
@@ -43,8 +43,8 @@ export default async function LoginAccount(page: Page): Promise<void> {
 		const sliderFlagSelector = ".nc-container .nc_scale .btn_ok"; // 滑块标记
 		await page.type(accountInputSelector, ACCOUNT, { delay: 10 });
 		await page.type(passswordInputSelector, PASSWORD, { delay: 10 });
-		await page.waitForSelector(sliderSelector, OPTS_WAITFOT_SELECTOR);
-		await page.waitForSelector(sliderBtnSelector, OPTS_WAITFOT_SELECTOR);
+		await page.waitForSelector(sliderSelector, WAITFOT_OPT);
+		await page.waitForSelector(sliderBtnSelector, WAITFOT_OPT);
 		const slider = await page.$(sliderSelector);
 		const sliderBtn = await page.$(sliderBtnSelector);
 		const sliderBox = await slider?.boundingBox();
@@ -56,7 +56,7 @@ export default async function LoginAccount(page: Page): Promise<void> {
 			await page.mouse.up();
 		}
 		try {
-			await page.waitForSelector(sliderFlagSelector, OPTS_WAITFOT_SELECTOR);
+			await page.waitForSelector(sliderFlagSelector, WAITFOT_OPT);
 			await page.click(loginBtnSelector);
 			await page.waitForNavigation({ waitUntil: "networkidle0" });
 		} catch (e) {
@@ -64,7 +64,7 @@ export default async function LoginAccount(page: Page): Promise<void> {
 		}
 		// 确认是否登录成功
 		try {
-			await page.waitForSelector(limitInfoSelector, OPTS_WAITFOT_SELECTOR);
+			await page.waitForSelector(limitInfoSelector, WAITFOT_OPT);
 			console.log(magentaBright("系统提示："), greenBright("登录成功"));
 		} catch (e) {
 			console.log(magentaBright("系统提示："), redBright("登录失败"), e);
