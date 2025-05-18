@@ -9,28 +9,30 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 // 检测是否已经登录（判断是否存在额度信息）
 export default async function LoginAccount(page: Page): Promise<void> {
 	await WaitFor();
+	// const confirmPopupSelector = ".pop-salerule2 .salerule-box"; // 确认弹窗
+	// const confirmBtnSelector = ".pop-salerule2 .salerule-box .btn-box .btn.confirm"; // 确认按钮
+	const confirmPopupSelector = ".salerule-box"; // 确认弹窗
+	const confirmBtnSelector = ".salerule-box .btn-box .btn.confirm"; // 确认按钮
 	const limitInfoSelector = ".second-header .limit .limit-box"; // 额度信息
 	const isLimitInfoVisible = await CheckElemVisible(page, limitInfoSelector);
+	const closeConfirmPopup = async function(): Promise<void> {
+		while (true) {
+			const isConfirmPopupVisible = await CheckElemVisible(page, confirmPopupSelector);
+			const isConfirmBtnVisible = await CheckElemVisible(page, confirmBtnSelector);
+			if (isConfirmPopupVisible && isConfirmBtnVisible) {
+				await page.click(confirmBtnSelector);
+				break;
+			} else {
+				console.log(magentaBright("系统提示："), yellowBright("未检测到弹窗，继续重试"));
+				await WaitFor(2000);
+			}
+		}
+	};
 	if (isLimitInfoVisible) {
 		console.log(blueBright("登录状态："), greenBright("已登录"));
 	} else {
 		console.log(blueBright("登录状态："), yellowBright("未登录，正在尝试登录"));
 		// 循环检测并点击弹窗按钮，直到弹窗消失
-		const closeConfirmPopup = async function(): Promise<void> {
-			const confirmPopupSelector = ".pop-salerule2 .salerule-box"; // 确认弹窗
-			const confirmBtnSelector = ".pop-salerule2 .salerule-box .btn-box .btn.confirm"; // 确认按钮
-			while (true) {
-				const isConfirmPopupVisible = await CheckElemVisible(page, confirmPopupSelector);
-				const isConfirmBtnVisible = await CheckElemVisible(page, confirmBtnSelector);
-				if (isConfirmPopupVisible && isConfirmBtnVisible) {
-					await page.click(confirmBtnSelector);
-					break;
-				} else {
-					console.log(magentaBright("系统提示："), yellowBright("未检测到弹窗，继续重试"));
-					await WaitFor(2000);
-				}
-			}
-		};
 		await closeConfirmPopup();
 		// 输入账号密码，滑动滑块，点击登录，进入首页
 		const accountInputSelector = ".login .main .container .inputbox.user .input"; // 账号输入框
@@ -67,5 +69,9 @@ export default async function LoginAccount(page: Page): Promise<void> {
 		} catch (e) {
 			console.log(magentaBright("系统提示："), redBright("登录失败"), e);
 		}
+		// 循环检测并点击弹窗按钮，直到弹窗消失
+		await WaitFor();
+		const isConfirmPopupVisible = await CheckElemVisible(page, confirmPopupSelector);
+		isConfirmPopupVisible && await closeConfirmPopup();
 	}
 }
