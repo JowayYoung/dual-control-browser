@@ -7,7 +7,7 @@
 	"main": "dist/index.js",
 	"scripts": {
 		"clean": "rimraf node_modules package-lock.json pnpm-lock.yaml yarn.lock",
-		"open:mac": "/Applications/Chrome.app/Contents/MacOS/Google\\ Chrome --remote-debugging-port=9222",
+		"open:mac": "/Applications/Chrome.app/Contents/MacOS/Google\\ Chrome --remote-debugging-port=9222 --user-data-dir=tmp/chrome-debug",
 		"open:windows": "C:/Program\\ Files/Google/Chrome/Application/chrome.exe --remote-debugging-port=9222",
 		"start": "tsx src/index.ts"
 	},

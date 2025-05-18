@@ -16,7 +16,7 @@ async function CheckElemVisible(page: Page, selecter: string): Promise<boolean> 
 	return isPopupVisible;
 }
 
-function ParseProducts(productsStr: string = ""): Product[][] {
+function ParseProducts(productsStr = ""): Product[][] {
 	const groups = productsStr.trim().split("--------------------");
 	return groups.map(group => {
 		// 处理每个分组中的商品
@@ -26,7 +26,7 @@ function ParseProducts(productsStr: string = ""): Product[][] {
 			const parts = v.trim().split(" ")
 				.filter(Boolean);
 			// 解析商品名称与商品描述
-			const nameMatch = parts[0].match(/(.*?)\((.*?)\)/);
+			const nameMatch = /(.*?)\((.*?)\)/.exec(parts[0]);
 			const name = nameMatch ? nameMatch[1] : parts[0];
 			const desc = nameMatch ? nameMatch[2] : "";
 			// 解析商品规格
