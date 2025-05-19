@@ -103,12 +103,35 @@ export default async function SearchProducts(page: Page, browser: Browser): Prom
 			// 4. 选择商品规格
 			const { results: { skuInfoVos: sepcsData } } = await (await productPromise).json() as SkuProductType;
 			if (specs.length) {
-				console.log("至少一个期望规格，需要遍历处理");
+				console.log("实际规格：", sepcsData.map(v => v.specName.toLowerCase()).join(", "));
+				console.log("期望规格：", specs.join(", "));
+				for (const [currSpecIndex, currSpec] of sepcsData.entries()) {
+					const productSpecItemSelector = `.pop-skusel .skusel-box .detail .spec .list .item:nth-of-type(${currSpecIndex + 1})`;
+					await page.click(productSpecItemSelector);
+					if (specs.includes(currSpec.specName) && !!currSpec.invNum && (quality ? currSpec.shortDesc.includes("大于1年") : true)) {
+						const index = specs.findIndex(v => v === currSpec.specName);
+						const [price, count] = purchase[index];
+						const diffCount = count === 1 || currSpec.invNum === 1 ? 0 : Math.min(count, currSpec.invNum) - currSpec.minAmount;
+						console.log("需要点几次按钮", diffCount);
+						if (price * rise >= currSpec.salePrice / 100) {
+							for (let i = 0; i < diffCount; i++) {
+								await page.click(SELECTOR.addBtn);
+								await WaitFor(300);
+							}
+							await page.waitForSelector(SELECTOR.cartBtn, WAITFOT_OPT);
+							await page.click(SELECTOR.cartBtn);
+							await page.waitForSelector(SELECTOR.cartMsg, WAITFOT_OPT);
+							console.log(magentaBright("系统提示："), greenBright(`${specs[index]}, ${diffCount + 1}件，加购成功`));
+						}
+					}
+					await WaitFor();
+				}
 			} else {
-				if (sepcsData[0].invNum) {
+				if (sepcsData[0].invNum && (quality ? sepcsData[0].shortDesc.includes("大于1年") : true)) {
 					const [price, count] = purchase[0];
-					const diffCount = count === 1 || sepcsData[0].invNum === 1 ? 1 : Math.min(count, sepcsData[0].invNum) - sepcsData[0].minAmount;
-					if (price * rise >= sepcsData[0].salePrice / 100 && (quality ? sepcsData[0].shortDesc.includes("大于1年") : true)) {
+					const diffCount = count === 1 || sepcsData[0].invNum === 1 ? 0 : Math.min(count, sepcsData[0].invNum) - sepcsData[0].minAmount;
+					console.log("需要点几次按钮", diffCount);
+					if (price * rise >= sepcsData[0].salePrice / 100) {
 						for (let i = 0; i < diffCount; i++) {
 							await page.click(SELECTOR.addBtn);
 							await WaitFor(300);
@@ -116,7 +139,7 @@ export default async function SearchProducts(page: Page, browser: Browser): Prom
 						await page.waitForSelector(SELECTOR.cartBtn, WAITFOT_OPT);
 						await page.click(SELECTOR.cartBtn);
 						await page.waitForSelector(SELECTOR.cartMsg, WAITFOT_OPT);
-						console.log(magentaBright("系统提示："), greenBright(`${diffCount === 1 ? 1 : diffCount}件，加购成功`));
+						console.log(magentaBright("系统提示："), greenBright(`${diffCount + 1}件，加购成功`));
 					}
 				}
 			}
