@@ -9,12 +9,12 @@ const { blueBright, greenBright, magentaBright, redBright, yellowBright } = Chal
 // const confirmPopupSelector = ".pop-salerule2 .salerule-box"; // 确认弹窗
 // const confirmBtnSelector = ".pop-salerule2 .salerule-box .btn-box .btn.confirm"; // 确认按钮
 const SELECTOR = {
-	accountInput: ".login .main .container .inputbox.user .input", // 账号输入框
-	confirmBtn: ".salerule-box .btn-box .btn.confirm", // 确认按钮
-	confirmPop: ".salerule-box", // 确认弹窗
+	accountIpt: ".login .main .container .inputbox.user .input", // 账号输入框
 	limitInfo: ".second-header .limit .limit-box", // 额度信息
 	loginBtn: ".login .main .container .submit", // 登录按钮
-	passwordInput: ".login .main .container .inputbox.pass .input", // 密码输入框
+	passwordIpt: ".login .main .container .inputbox.pass .input", // 密码输入框
+	popupBox: ".salerule-box", // 确认弹窗
+	popupBtn: ".salerule-box .btn-box .btn.confirm", // 确认按钮
 	slider: ".nc_scale", // 滑块
 	sliderBtn: ".nc-container .nc_scale .btn_slide", // 滑块按钮
 	sliderFlag: ".nc-container .nc_scale .btn_ok" // 滑块标记
@@ -22,15 +22,14 @@ const SELECTOR = {
 
 async function CloseConfirmPopup(page: Page): Promise<void> {
 	try {
-		await page.waitForSelector(SELECTOR.confirmPop, { ...WAITFOT_OPT, timeout: 100000 });
-		await page.waitForSelector(SELECTOR.confirmBtn, { ...WAITFOT_OPT, timeout: 100000 });
-		await page.click(SELECTOR.confirmBtn);
+		await page.waitForSelector(SELECTOR.popupBox, { ...WAITFOT_OPT, timeout: 100000 });
+		await page.waitForSelector(SELECTOR.popupBtn, { ...WAITFOT_OPT, timeout: 100000 });
+		await page.click(SELECTOR.popupBtn);
 	} catch {
 		console.log(magentaBright("系统提示："), yellowBright("未检测到确认弹窗"));
 	}
 }
 
-// 检测是否已经登录（判断是否存在额度信息）
 export default async function LoginAccount(page: Page): Promise<boolean> {
 	// 1. 检查登录状态
 	try {
@@ -41,8 +40,8 @@ export default async function LoginAccount(page: Page): Promise<boolean> {
 		// 2. 检测确认弹窗并关闭
 		await CloseConfirmPopup(page);
 		// 3. 输入账号密码
-		await page.type(SELECTOR.accountInput, ACCOUNT, { delay: 10 });
-		await page.type(SELECTOR.passwordInput, PASSWORD, { delay: 10 });
+		await page.type(SELECTOR.accountIpt, ACCOUNT, { delay: 10 });
+		await page.type(SELECTOR.passwordIpt, PASSWORD, { delay: 10 });
 		// 4. 拖动验证滑块
 		await page.waitForSelector(SELECTOR.slider, WAITFOT_OPT);
 		const slider = await page.$(SELECTOR.slider);
@@ -74,7 +73,7 @@ export default async function LoginAccount(page: Page): Promise<boolean> {
 	}
 	// 7. 检测确认弹窗并关闭
 	await WaitFor();
-	const isPopupVisible = await CheckElemVisible(page, SELECTOR.confirmPop);
+	const isPopupVisible = await CheckElemVisible(page, SELECTOR.popupBox);
 	isPopupVisible && await CloseConfirmPopup(page);
 	console.log(magentaBright("系统提示："), greenBright("进入首页"));
 	return true;

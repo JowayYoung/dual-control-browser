@@ -1,7 +1,7 @@
 import { connect } from "puppeteer-core";
 import Chalk from "chalk";
 
-import { LoginAccount } from "./libs";
+import { LoginAccount, SearchProducts } from "./libs";
 
 const { magentaBright } = Chalk;
 
@@ -17,8 +17,9 @@ const { magentaBright } = Chalk;
 		const pages = await browser.pages();
 		const page = pages[0]; // 使用第一个打开的页面
 		const flag = await LoginAccount(page);
-		console.log("登录状态", flag);
-		// await LockOrder(page);
+		if (flag) {
+			await SearchProducts(page);
+		}
 		await browser.disconnect();
 		console.log(magentaBright("-----浏览器已断开-----"));
 	} catch (e) {
