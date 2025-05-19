@@ -2,8 +2,13 @@ import type { WaitForSelectorOptions } from "puppeteer-core";
 
 // 配置
 const WAITFOT_OPT: WaitForSelectorOptions = {
-	timeout: 3000,
+	timeout: 5000,
 	visible: true
+};
+
+const WAITFOT_HIDDEN_OPT: WaitForSelectorOptions = {
+	hidden: true,
+	timeout: 5000
 };
 
 const WEBSITE = "https://www.loreal-boutique.com/";
@@ -53,6 +58,7 @@ export {
 	ACCOUNT,
 	PASSWORD,
 	PRODUCTS,
+	WAITFOT_HIDDEN_OPT,
 	WAITFOT_OPT,
 	WEBSITE
 };

@@ -13,15 +13,15 @@ const { magentaBright } = Chalk;
 		defaultViewport: null
 	});
 	try {
-		console.log(magentaBright("-----浏览器已连接-----"));
+		console.log(magentaBright("----- 浏览器已连接 -----\n"));
 		const pages = await browser.pages();
 		const page = pages[0]; // 使用第一个打开的页面
 		const flag = await LoginAccount(page);
 		if (flag) {
-			await SearchProducts(page);
+			await SearchProducts(page, browser);
 		}
 		await browser.disconnect();
-		console.log(magentaBright("-----浏览器已断开-----"));
+		console.log(magentaBright("\n----- 浏览器已断开 -----"));
 	} catch (e) {
 		console.error("程序发生错误:", e);
 		// await browser.close();
